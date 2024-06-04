@@ -1,0 +1,10 @@
+ERROR: pip's dependency resolver does not currently take into account all the packages that are installed. This behaviour is the source of the following dependency conflicts.
+botocore 1.29.158 requires urllib3<1.27,>=1.25.4, but you have urllib3 2.2.1 which is incompatible.
+sparse-autoencoder 1.10.0 requires datasets>=2.16.1, but you have datasets 2.12.0 which is incompatible.
+sparse-autoencoder 1.10.0 requires einops>=0.7.0, but you have einops 0.6.1 which is incompatible.
+sparse-autoencoder 1.10.0 requires tokenizers>=0.15.1, but you have tokenizers 0.13.3 which is incompatible.
+sparse-autoencoder 1.10.0 requires torch>=2.1.2, but you have torch 2.0.1 which is incompatible.
+sparse-autoencoder 1.10.0 requires transformers>=4.37.1, but you have transformers 4.30.1 which is incompatible.
+sparse-autoencoder 1.10.0 requires wandb>=0.16.2, but you have wandb 0.15.3 which is incompatible.
+sentry-sdk 1.24.0 requires urllib3<2.0.0, but you have urllib3 2.2.1 which is incompatible.
+torchaudio 2.3.0+cu118 requires torch==2.3.0, but you have torch 2.0.1 which is incompatible.
