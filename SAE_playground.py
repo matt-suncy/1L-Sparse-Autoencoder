@@ -426,9 +426,10 @@ def feature_search(path, model, encoder, batch_size=128, token_length=128):
     dataset = dataset.rename_column('content', 'text')
     dataset = dataset.filter(lambda x: x['text'] != None)
 
+    # Do custom filtering here
     segment = dataset.filter(lambda x: x['sentiment'] == 'surprise')
 
-    batch_df, sorted_idxs, hidden_acts = feature_search(segment, model, encoder)
+    batch_df, sorted_idxs, hidden_acts = _feature_search_worker(segment, model, encoder)
 
     return batch_df, sorted_idxs, hidden_acts
 
@@ -494,7 +495,12 @@ if __name__ == '__main__':
     # Load the dataset as an HG dataset
     path = r'/home/jovyan/1L-Sparse-Autoencoder/tweet_emotions.csv'
 
-    with_keyword = keyword_search(model, encoder, 'happy')
+    batch_df, sorted_idxs, hidden_acts = feature_search(path, model, encoder)
+
+    batch_df['feature'] = get_hidden_act(hidden_acts, sorted_idxs, 0)
+    batch_df_love.sort_values("feature", ascending=False).head(20).style.background_gradient("coolwarm")
+
+    #with_keyword = keyword_search(model, encoder, 'happy')
     
 
 
