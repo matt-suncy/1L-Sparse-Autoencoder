@@ -182,7 +182,6 @@ def steered_forward(target_model, autoencoder, prompt, target_feature, multiplie
     hidden_activations = model_mlp_out @ autoencoder.W_enc
     print('hidden_activations.shape', hidden_activations.shape)
     hidden_activations[:, :, target_feature] *= multiplier
-    print('hidden_activations', hidden_activations)
     augmented_reconstruction = autoencoder.decode(hidden_activations)
     print('augmented_reconstruction.shape', augmented_reconstruction.shape)
     output = target_model(augmented_reconstruction, start_at_layer=1)
