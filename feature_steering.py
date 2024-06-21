@@ -12,7 +12,7 @@ from huggingface_hub import HfApi
 from IPython.display import HTML
 from functools import partial
 import tqdm.notebook as tqdm
-import plotly.express as px
+import plotly.express as px 
 import pandas as pd
 
 torch.set_grad_enabled(False)
@@ -65,7 +65,7 @@ class AutoEncoder(nn.Module):
         self.d_hidden = d_hidden
         self.l1_coeff = l1_coeff
 
-        self.to("cpu")
+        self.to("cuda")
 
     def forward(self, x):
         x_cent = x - self.b_dec
@@ -75,6 +75,15 @@ class AutoEncoder(nn.Module):
         l1_loss = self.l1_coeff * (acts.float().abs().sum())
         loss = l2_loss + l1_loss
         return loss, x_reconstruct, acts, l2_loss, l1_loss
+
+    @torch.no_grad()
+    def encode(self, x):
+        x_cent = x - self.b_dec
+        return F.relu(x_cent @ self.W_enc + self.b_enc)
+
+    @torch.no_grad()
+    def decode(self, hidden_acts):
+        return hidden_acts @ self.W_dec + self.b_dec
 
     @torch.no_grad()
     def remove_parallel_component_of_grads(self):
@@ -114,9 +123,6 @@ class AutoEncoder(nn.Module):
 
                     param = getattr(instance, new_key)
                     new_value = torch.squeeze(new_value)
-                    print('new_key:', new_key)
-                    print('param.shape:', param.shape)
-                    print('new_value.shape:', new_value.shape)
 
                     if param.shape != new_value.shape:
 
@@ -152,9 +158,6 @@ class AutoEncoder(nn.Module):
         #self.load_state_dict(utils.download_file_from_hf("NeelNanda/sparse_autoencoder", f"{version}.pt", force_is_torch=True))
         ae_state_dict = utils.download_file_from_hf("matt-suncy/sparse_autoencoder", f"{version}.pt", force_is_torch=True).state_dict
 
-        for key in ae_state_dict:
-            print(key, ae_state_dict[key].shape)
-
         #self.load_state_dict(utils.download_file_from_hf("matt-suncy/sparse_autoencoder", f"{version}.pt", force_is_torch=True).state_dict)
         # Change state_dict mappings
         key_mapping = {
@@ -174,18 +177,17 @@ auto_encoder_run = 'tough-sweep-1_final' # @param ["run1", "run2"]
 encoder = AutoEncoder.load_from_hf(auto_encoder_run)
 
 def steered_forward(target_model, autoencoder, prompt, target_feature, multiplier=5):
-    model_mlp_out = target_model(prompt, output_hidden_states=True).hidden_states[-1]
+    model_mlp_out = target_model(prompt, stop_at_layer=0)
     print('model_mlp_out.shape', model_mlp_out.shape)
-    print('model_mlp_out', model_mlp_out)
-    hidden_activations = autoencoder.encode(model_mlp_out)
+    hidden_activations = model_mlp_out @ autoencoder.W_enc
     print('hidden_activations.shape', hidden_activations.shape)
-    print('hidden_activations', hidden_activations)
-    hidden_activations[0][target_feature] = hidden_activations[0][target_feature] * multiplier
+    hidden_activations[:, :, target_feature] *= multiplier
     print('hidden_activations', hidden_activations)
     augmented_reconstruction = autoencoder.decode(hidden_activations)
     print('augmented_reconstruction.shape', augmented_reconstruction.shape)
-    print('augmented_reconstruction', augmented_reconstruction)
-    output = target_model(augmented_reconstruction, output_hidden_states=True)
+    output = target_model(augmented_reconstruction, start_at_layer=1)
     return output
 
 steered_output = steered_forward(model, encoder, prompt, 7, 5)
+
+# Ok cool but now how do I get the predictions?
