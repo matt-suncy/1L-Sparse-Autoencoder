@@ -187,5 +187,7 @@ def steered_forward(target_model, autoencoder, prompt, target_feature, multiplie
     output = target_model(augmented_reconstruction, start_at_layer=1)
     return output
 
+
 steered_output = steered_forward(model, encoder, prompt, 7, 5)
+# Check type of steered_output
 print('type(steered_output)', type(steered_output))
