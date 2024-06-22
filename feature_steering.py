@@ -188,5 +188,4 @@ def steered_forward(target_model, autoencoder, prompt, target_feature, multiplie
     return output
 
 steered_output = steered_forward(model, encoder, prompt, 7, 5)
-
-# Ok cool but now how do I get the predictions?
+print('type(steered_output)', type(steered_output))
