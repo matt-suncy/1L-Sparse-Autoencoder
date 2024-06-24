@@ -14,6 +14,10 @@ from functools import partial
 import tqdm.notebook as tqdm
 import plotly.express as px 
 import pandas as pd
+from rich import print as rprint
+
+import sys         
+sys.path.append(r'/home/jovyan/SAELens/home/jovyan/SAELens') 
 
 torch.set_grad_enabled(False)
 print('Disabled autograd')
@@ -176,7 +180,8 @@ class AutoEncoder(nn.Module):
 auto_encoder_run = 'tough-sweep-1_final' # @param ["run1", "run2"]
 encoder = AutoEncoder.load_from_hf(auto_encoder_run)
 
-def steered_forward(target_model, autoencoder, prompt, target_feature, multiplier=5):
+def steered_forward(target_model, autoencoder, prompt, target_feature, multiplier=5, top_k=10):
+    
     model_mlp_out = target_model(prompt, stop_at_layer=0)
     print('model_mlp_out.shape', model_mlp_out.shape)
     hidden_activations = model_mlp_out @ autoencoder.W_enc
@@ -184,10 +189,20 @@ def steered_forward(target_model, autoencoder, prompt, target_feature, multiplie
     hidden_activations[:, :, target_feature] *= multiplier
     augmented_reconstruction = autoencoder.decode(hidden_activations)
     print('augmented_reconstruction.shape', augmented_reconstruction.shape)
-    output = target_model(augmented_reconstruction, start_at_layer=1)
-    return output
+
+    prompt_length = len(target_model.to_str_tokens(prompt, prepend_bos=True))
+    logits = target_model(augmented_reconstruction, start_at_layer=1)
+    logits = utils.remove_batch_dim(logits)
+    token_probs = logits.softmax(dim=-1)
+    token_probs = token_probs[prompt_length-1]
+    sorted_token_probs, sorted_token_values = token_probs.sort(descending=True)
+
+    for i in range(top_k):
+        print(
+                f"Top {i}th token. Logit: {logits[prompt_length-1, sorted_token_values[i]].item():5.2f} Prob: {sorted_token_probs[i].item():6.2%} Token: |{target_model.to_string(sorted_token_values[i])}|"
+                )
+
+    return sorted_token_values
 
 
-steered_output = steered_forward(model, encoder, prompt, 7, 5)
-# Check type of steered_output
-print('type(steered_output)', type(steered_output))
+steered_output = steered_forward(model, encoder, prompt, 7, 100)
