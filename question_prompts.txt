@@ -1,0 +1,11 @@
+Happy:
+Valerie received her Christmas present. What does she feel?
+
+Sad:
+John just lost a family member. What does he feel?
+John just lost a family member. He is feeling
+John just lost a family member. John is feeling
+John just lost a family member. John feels
+
+Angry:
+Emily\'s lunch was stolen. What does she feel?
