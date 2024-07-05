@@ -1,0 +1,64 @@
+# This works pretty well!
+
+(a) sadness
+(b) joy
+(c) love
+(d) anger
+(e) fear
+(f) surprise
+
+---
+
+Text:
+\```
+John feels angry. 
+\```
+Label: (d)
+
+---
+
+Text:
+\```
+John feels surprised. 
+\```
+Label: (f)
+
+---
+
+Text:
+\```
+John feels romantic. 
+\```
+Label: (c)
+
+---
+
+Text:
+\```
+John feels sad. 
+\```
+Label: (a)
+
+---
+
+Text:
+\```
+John feels afraid. 
+\```
+Label: (e)
+
+---
+
+Text:
+\```
+John feels happy. 
+\```
+Label: (b)
+
+---
+
+Text:
+\```
+John feels content without knowing the rest of their story.
+\```
+Label:
