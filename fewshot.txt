@@ -1,4 +1,4 @@
-# This works pretty well!
+Label the text with the correct emotion:
 
 (a) sadness
 (b) joy
@@ -54,11 +54,3 @@ Text:
 John feels happy. 
 \```
 Label: (b)
-
----
-
-Text:
-\```
-John feels content without knowing the rest of their story.
-\```
-Label:
